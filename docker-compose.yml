@@ -1,0 +1,7 @@
+version: '2'
+services:
+  csv-sorting-service:
+    container_name: csv-sorting-service
+    image: csv-sorting-service:latest
+    ports:
+    - 18080:8080
