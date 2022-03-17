@@ -66,6 +66,10 @@
 ### Metrics
 * Consider adding metrics either through framework or possibly logging
 
+### Miscellaneous
+* Tag initial version in git
+* Parameterize artifact version, currently it appears in multiple places
+
 ### HTTP Status of response
 * Currently, does not respond with an HTTPStatus
 
