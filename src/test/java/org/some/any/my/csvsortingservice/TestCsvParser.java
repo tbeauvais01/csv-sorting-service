@@ -1,6 +1,7 @@
 package org.some.any.my.csvsortingservice;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class TestCsvParser {
 
         //test windows carriage return linefeed CRLF
         List<List<String>> res2 = csvParser.parseCsv("\r\nheader1,header2\r\n" +
-                "value1,value2\r\n");
+                "value1,value2");
         Assertions.assertEquals(res, res2);
 
         //test Mac carriage return CR
@@ -52,6 +53,77 @@ public class TestCsvParser {
         res = csvParser.parseCsv("\r\n\r\n");
         Assertions.assertTrue(res.isEmpty());
     }
+
+    @Test
+    public void testEmptyValuesInput() {
+        List<List<String>> res = csvParser.parseCsv("\nheader1,header2,header3\n" +
+                "value1,,value3\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("header1", res.get(0).get(0));
+        Assertions.assertEquals("header2", res.get(0).get(1));
+        Assertions.assertEquals("header3", res.get(0).get(2));
+        Assertions.assertEquals("value1", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("value3", res.get(1).get(2));
+
+        res = csvParser.parseCsv("\nheader1,header2,header3\n" +
+                "value1,,\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("header1", res.get(0).get(0));
+        Assertions.assertEquals("header2", res.get(0).get(1));
+        Assertions.assertEquals("header3", res.get(0).get(2));
+        Assertions.assertEquals("value1", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("", res.get(1).get(2));
+
+        res = csvParser.parseCsv("\nheader1,header2,header3\n" +
+                ",,\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("header1", res.get(0).get(0));
+        Assertions.assertEquals("header2", res.get(0).get(1));
+        Assertions.assertEquals("header3", res.get(0).get(2));
+        Assertions.assertEquals("", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("", res.get(1).get(2));
+
+        res = csvParser.parseCsv("\n,,\n" +
+                ",,\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("", res.get(0).get(0));
+        Assertions.assertEquals("", res.get(0).get(1));
+        Assertions.assertEquals("", res.get(0).get(2));
+        Assertions.assertEquals("", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("", res.get(1).get(2));
+    }
+
+    @Test
+    public void testInputWithDoubleQuotedValues() {
+        List<List<String>> res = csvParser.parseCsv("\nheader1,\"header \"\"2\"\"\",header3\n" +
+                "value1,,value3\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("header1", res.get(0).get(0));
+        Assertions.assertEquals("\"header \"\"2\"\"\"", res.get(0).get(1));
+        Assertions.assertEquals("header3", res.get(0).get(2));
+        Assertions.assertEquals("value1", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("value3", res.get(1).get(2));
+    }
+
+    @Disabled
+    @Test
+    public void testInputWithDoubleQuotedValuesAndCommas() {
+        List<List<String>> res = csvParser.parseCsv("\nheader1,\"header \"\",2\"\"\",header3\n" +
+                "value1,,value3\n");
+        Assertions.assertEquals(2, res.size());
+        Assertions.assertEquals("header1", res.get(0).get(0));
+        Assertions.assertEquals("\"header \"\"2\"\"\"", res.get(0).get(1));
+        Assertions.assertEquals("header3", res.get(0).get(2));
+        Assertions.assertEquals("value1", res.get(1).get(0));
+        Assertions.assertEquals("", res.get(1).get(1));
+        Assertions.assertEquals("value3", res.get(1).get(2));
+    }
+
 
     @Test
     public void testParseMalformedQuotesException() {

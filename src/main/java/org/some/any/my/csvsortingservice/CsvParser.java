@@ -13,14 +13,12 @@ public class CsvParser {
         List<String> lines = splitByLine(csv);
 
         //split lines by comma
-        List<List<String>> retVal = splitLinesByComma(lines);
-
-        return retVal;
+        return splitLinesByComma(lines);
     }
 
     private List<List<String>> splitLinesByComma(List<String> lines) {
         List<List<String>> retVal = new ArrayList<>();
-        int previousComma = 0;
+        int tokenStartIndex = 0;
         int maxSize = 0;
         int minSize = 0;
         for(String line: lines) {
@@ -30,19 +28,19 @@ public class CsvParser {
 
                 if(currentChar == ',' || i == line.length() -1) {
                     //handle quoted commas
-                    int doubleQuoteIndex = line.indexOf("\"", previousComma);
+                    int doubleQuoteIndex = line.indexOf("\"", tokenStartIndex);
                     if( doubleQuoteIndex > 0 && doubleQuoteIndex < i && doubleQuoteIndex < line.length() -2) {
                         int nextDoubleQuoteIndex = line.indexOf('"', doubleQuoteIndex + 1);
                         int nextCommaAfterNextQuote = line.indexOf(",",nextDoubleQuoteIndex);
                         if (nextDoubleQuoteIndex > 0) {
                             boolean fullLine = nextDoubleQuoteIndex == line.length() - 1;
                             if (fullLine) {
-                                splitLine.add(line.substring(previousComma).strip());
+                                splitLine.add(line.substring(tokenStartIndex).strip());
                             } else {
-                                splitLine.add(line.substring(previousComma, nextCommaAfterNextQuote).strip());
+                                splitLine.add(line.substring(tokenStartIndex, nextCommaAfterNextQuote).strip());
                             }
-                            previousComma = nextCommaAfterNextQuote < 0 ? nextDoubleQuoteIndex: nextCommaAfterNextQuote + 1;
-                            i = previousComma;
+                            tokenStartIndex = nextCommaAfterNextQuote < 0 ? nextDoubleQuoteIndex: nextCommaAfterNextQuote + 1;
+                            i = tokenStartIndex;
                             continue;
                         } else {
                             throw new IllegalArgumentException("Input has mismatching quotes.");
@@ -52,15 +50,22 @@ public class CsvParser {
                     //handle non quoted commas
 
                     boolean fullLine = i == line.length() -1;
-                    if(fullLine) {
-                        splitLine.add(line.substring(previousComma).strip());
+                    boolean contiguousCommas = i > 0 && line.charAt(i -1) == ',' && currentChar == ',';
+                    boolean leadingOrTrailingEmptyValue = i == 0 || fullLine && line.charAt(line.length() - 1) == ',';
+                    if (contiguousCommas || leadingOrTrailingEmptyValue) {
+                        splitLine.add("");
+                        if(contiguousCommas && leadingOrTrailingEmptyValue) {
+                            splitLine.add("");
+                        }
+                    } else if(fullLine) {
+                        splitLine.add(line.substring(tokenStartIndex).strip());
                     } else {
-                        splitLine.add(line.substring(previousComma, i).strip());
+                        splitLine.add(line.substring(tokenStartIndex, i).strip());
                     }
-                    previousComma = i+1;
+                    tokenStartIndex = i+1;
                 }
             }
-            previousComma = 0;
+            tokenStartIndex = 0;
             maxSize = Math.max(splitLine.size(), maxSize);
             minSize = minSize == 0? splitLine.size(): Math.min(splitLine.size(), minSize);
             retVal.add(splitLine);
