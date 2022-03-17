@@ -13,8 +13,8 @@ public class CsvSortingController {
     @Autowired
     private CsvSorter csvSorter;
 
-    @RequestMapping(value = "/sortCsv", consumes = "text/csv", method = RequestMethod.POST)
-    public @ResponseBody String sortCsv(@RequestBody String csv, @RequestParam String header) {
+    @RequestMapping(value = "/sortCsv/{header}", consumes = "text/csv", method = RequestMethod.POST)
+    public @ResponseBody String sortCsv(@RequestBody String csv, @PathVariable String header) {
         if(header == null) {
             return csv;
         }
@@ -32,11 +32,14 @@ public class CsvSortingController {
                 }
             }
             return csvSorter.sortCsv(splitCsv, header);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return e.getMessage();
+        } catch (Exception e) {
+            return "Error occurred while processing the request.";
         }
 
     }
+
 
 }
 
