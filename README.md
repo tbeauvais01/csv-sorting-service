@@ -74,5 +74,5 @@
 * Currently, does not respond with an HTTPStatus
 
 ### Thoughts
-1. Lot's more to do.
+1. A lot more todo.
 2. Refactoring and scanning the input CSV only once would improve performance on large inputs
