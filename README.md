@@ -28,7 +28,7 @@
 ## TO-DO's
 ### Features
 * Edge Cases: CSV Standard*
-    + Handle commas in within double quoted values i.e ```value1, "value "",2""", value3```
+    + Handle commas within double quoted values i.e ```value1, "value "",2""", value3```
     + Handle line breaks within double quoted values i.e ```value1, "value ""\n2""", value3```
 
 ### Documentation 
