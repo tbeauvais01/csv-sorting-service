@@ -69,6 +69,7 @@
 ### Miscellaneous
 * Tag initial version in git
 * Parameterize artifact version, currently it appears in multiple places
+* Remove .mvn dir from git repo, and update .gitignore
 
 ### HTTP Status of response
 * Currently, does not respond with an HTTPStatus

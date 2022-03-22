@@ -18,19 +18,19 @@ public class CsvSorter {
         Integer csvFieldForSort = headerIndexes.get(sortCriteria);
 
         //create map to sort fields by index
-        Map<String, Integer> sortedFieldsMap = new TreeMap<>(Collections.reverseOrder());
+        List<SortItem> sortedFields = new ArrayList<>();
         for(int i = 1 ; i<splitCsv.size(); i++) {
-            sortedFieldsMap.put(splitCsv.get(i).get(csvFieldForSort), i);
+            sortedFields.add( new SortItem(i, splitCsv.get(i).get(csvFieldForSort)));
         }
 
-        Collection<Integer> sortedCsvLineOrder = sortedFieldsMap.values();
+        Collections.sort(sortedFields);
 
         //build result
         //add header
         StringBuilder sb = new StringBuilder();
         sb.append(addLineToResult(splitCsv, 0));
-        for(Integer integer: sortedCsvLineOrder) {
-            sb.append(addLineToResult(splitCsv, integer));
+        for(SortItem item: sortedFields) {
+            sb.append(addLineToResult(splitCsv, item.getIndex()));
         }
 
         return sb.toString();
@@ -50,5 +50,30 @@ public class CsvSorter {
             i++;
         }
         return sb.toString();
+    }
+}
+
+class SortItem implements Comparable<SortItem> {
+
+    private int index;
+    private String sortField;
+
+    public SortItem(int index, String sortField) {
+        this.index = index;
+        this.sortField = sortField;
+    }
+
+    @Override
+    public int compareTo(SortItem o) {
+        Comparator<String> reverse = Collections.reverseOrder();
+        return reverse.compare(this.sortField, o.getSortField());
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public String getSortField() {
+        return sortField;
     }
 }
