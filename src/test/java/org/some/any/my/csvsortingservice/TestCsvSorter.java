@@ -39,13 +39,13 @@ class TestCsvSorter {
 
 
         //Test sorting with dupes
-        List<String> line3 = Stream.of("b", "x").collect(Collectors.toList());
+        List<String> line3 = Stream.of("c", "x").collect(Collectors.toList());
         splitCsv.add(line3);
 
         res = csvSorter.sortCsv(splitCsv, "Header2");
         Assertions.assertEquals("Header1, Header2\n" +
                 "b, x\n" +
-                "b, x\n" +
+                "c, x\n" +
                 "z, a\n", res );
     }
 }

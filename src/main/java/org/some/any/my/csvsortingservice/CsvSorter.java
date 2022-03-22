@@ -66,7 +66,11 @@ class SortItem implements Comparable<SortItem> {
     @Override
     public int compareTo(SortItem o) {
         Comparator<String> reverse = Collections.reverseOrder();
-        return reverse.compare(this.sortField, o.getSortField());
+        int retVal  = reverse.compare(this.sortField, o.getSortField());
+
+        //keep original ordering in case of dupes on sort field
+        retVal = retVal == 0? this.index - o.getIndex()  : retVal;
+        return retVal;
     }
 
     public int getIndex() {
